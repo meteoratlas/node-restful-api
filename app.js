@@ -1,9 +1,16 @@
 const fs = require('fs');
 const _ = require('lodash');
 const express = require('express');
+const morgan = require('morgan');
 
 const app = express();
+app.use(morgan('dev'));
 app.use(express.json());
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
@@ -12,6 +19,7 @@ const tours = JSON.parse(
 const getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
+    requestedAt: req.requestTime,
     results: tours.length,
     data: {
       tours,
@@ -84,8 +92,52 @@ const deleteTour = (req, res) => {
   });
 };
 
-app.route('/api/v1/tours').get(getAllTours).post(createTour);
-app.route('/api/v1/tours/:id').get(getTour).patch(patchTour).delete(deleteTour);
+const getAllUsers = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is currently unavailable.',
+  });
+};
+
+const createUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is currently unavailable.',
+  });
+};
+
+const getUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is currently unavailable.',
+  });
+};
+
+const patchUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is currently unavailable.',
+  });
+};
+
+const deleteUser = (req, res) => {
+  res.status(500).json({
+    status: 'error',
+    message: 'This route is currently unavailable.',
+  });
+};
+
+const tourRouter = express.Router();
+app.use('/api/v1/tours', tourRouter);
+
+tourRouter.route('/').get(getAllTours).post(createTour);
+tourRouter.route('/:id').get(getTour).patch(patchTour).delete(deleteTour);
+
+const userRouter = express.Router();
+app.use('/api/v1/users', userRouter);
+
+app.route('/').get(getAllUsers).post(createUser);
+app.route('/:id').get(getUser).patch(patchUser).delete(deleteUser);
 
 const port = 3000;
 app.listen(port, () => {
