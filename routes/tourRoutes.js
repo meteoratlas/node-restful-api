@@ -1,7 +1,5 @@
 const express = require('express');
 const {
-  tours,
-  checkID,
   checkBody,
   getAllTours,
   createTour,
@@ -12,7 +10,7 @@ const {
 
 const router = express.Router();
 
-router.param('id', checkID);
+//router.param('id', checkID);
 
 // middleware cam optionally be first value of route function
 router.route('/').get(getAllTours).post(checkBody, createTour);
