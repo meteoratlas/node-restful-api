@@ -6,13 +6,46 @@ const getAllTours = async (req, res) => {
     // build query
     const queryObj = { ...req.query };
 
+    // Filter results
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((e) => delete queryObj[e]);
 
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
-    const query = await Tour.find(JSON.parse(queryStr));
+    let query = Tour.find(JSON.parse(queryStr));
+
+    // Sort results
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      // sort by date (starting with newest) if no sorting option
+      query = query.sort('-createdAt');
+    }
+
+    // field limiting
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      // exclude mongoDB metadata by default
+      query.select('-__v');
+    }
+
+    // pagination
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 100;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) {
+        throw new Error('The requested page does not exist.');
+      }
+    }
 
     // execute query
     const tours = await query;
