@@ -76,6 +76,8 @@ tourSchema.post('save', function (doc, next) {
   next();
 });
 
+// These involve removing secret tours from query and aggregate results
+
 // *query* middleware
 // /^find/ = matches for all strings that begin with "find"
 // catches find(), findOne(), findOneAndDelete(), etc.
@@ -87,6 +89,16 @@ tourSchema.pre(/^find/, function (next) {
 
 tourSchema.post(/^find/, function (docs, next) {
   console.log(`Query took ${Date.now() - this.start} ms.`);
+
+  next();
+});
+
+// aggregation middleware
+
+tourSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({
+    $match: { secretTour: { $ne: true } },
+  });
 
   next();
 });

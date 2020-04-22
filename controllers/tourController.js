@@ -124,12 +124,13 @@ const getTourStats = async (req, res) => {
           avgPrice: 1,
         },
       },
-      {
-        $match: {
-          // $ne = not equal
-          _id: { $ne: 'EASY' },
-        },
-      },
+      // {
+      //   // remove easy tours from result
+      //   $match: {
+      //     // $ne = not equal
+      //     _id: { $ne: 'EASY' },
+      //   },
+      // },
     ]);
 
     res.status(200).json({
