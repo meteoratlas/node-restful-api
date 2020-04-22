@@ -16,6 +16,7 @@
     "lodash": "^4.17.15",
     "mongoose": "^5.9.9",
     "morgan": "^1.10.0",
-    "slugify": "^1.4.0"
+    "slugify": "^1.4.0",
+    "validator": "^13.0.0"
   }
 }
