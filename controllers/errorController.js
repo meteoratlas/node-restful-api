@@ -5,6 +5,20 @@ const handleCastErrorDB = (error) => {
   return new AppError(message, 400);
 };
 
+const handleDuplicateFields = (error) => {
+  const value = error.errmsg.match(/(["'])(\\?.)*?\1/)[0];
+
+  const message = `Duplicate field ${value} in unique field.`;
+  return new AppError(message, 400);
+};
+
+const handleValidationError = (error) => {
+  const errors = Object.values(error.errors).map((el) => el.message);
+  const message = `Invalid input data, ${errors.join('. ')}`;
+
+  return new AppError(message, 400);
+};
+
 const sendErrorDev = (error, res) => {
   res.status(error.statusCode).json({
     status: error.status,
@@ -39,8 +53,19 @@ module.exports = (error, req, res, next) => {
     sendErrorDev(error, res);
   } else if (process.env.NODE_ENV === 'production') {
     let origError = { ...error };
+    // console.log(error);
+    // console.log(origError);
+
     if (origError.name === 'CastError') {
       origError = handleCastErrorDB(origError);
+    }
+    if (origError.code === 11000) {
+      console.log('Field issue');
+
+      origError = handleDuplicateFields(origError);
+    }
+    if (origError.name === 'ValidationError') {
+      origError = handleValidationError(origError);
     }
     sendErrorProd(origError, res);
   }
