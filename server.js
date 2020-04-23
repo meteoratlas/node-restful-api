@@ -1,5 +1,23 @@
 const dotenv = require('dotenv').config();
 const mongoose = require('mongoose');
+
+// global exception safety net
+process.on('unhandledRejection', (error) => {
+  console.warn('Unhandled Rejection - shutting down.');
+  server.close(() => {
+    // 1 == uncaught exception
+    process.exit(1);
+  });
+});
+
+process.on('uncaughtException', (error) => {
+  console.warn('Unhandled Exception - shutting down.');
+  server.close(() => {
+    // 1 == uncaught exception
+    process.exit(1);
+  });
+});
+
 const app = require('./app');
 
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.MONGODD_PASS);
@@ -14,6 +32,6 @@ mongoose
     console.log('Connection successful.');
   });
 
-app.listen(process.env.PORT, () => {
+const server = app.listen(process.env.PORT, () => {
   console.log('App running on port', process.env.PORT);
 });
