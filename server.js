@@ -1,5 +1,6 @@
 const dotenv = require('dotenv').config();
 const mongoose = require('mongoose');
+const chalk = require('chalk');
 
 // global exception safety net
 process.on('unhandledRejection', (error) => {
@@ -29,7 +30,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    console.log('Connection successful.');
+    console.log(chalk.inverse.blue('Connection successful.'));
   });
 
 const server = app.listen(process.env.PORT, () => {
