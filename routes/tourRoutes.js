@@ -19,6 +19,14 @@ router.route('/tour-stats').get(getTourStats);
 
 // middleware cam optionally be first value of route function
 router.route('/').get(authController.protect, getAllTours).post(createTour);
-router.route('/:id').get(getTour).patch(patchTour).delete(deleteTour);
+router
+  .route('/:id')
+  .get(getTour)
+  .patch(patchTour)
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    deleteTour
+  );
 
 module.exports = router;

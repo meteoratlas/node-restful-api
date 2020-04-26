@@ -17,6 +17,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     password,
     passwordConfirm,
     passwordChangedAt,
+    role,
   } = req.body;
 
   const newUser = await User.create({
@@ -25,6 +26,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     password,
     passwordConfirm,
     passwordChangedAt,
+    role,
   });
 
   const token = signToken(newUser._id);
@@ -103,3 +105,17 @@ exports.protect = catchAsync(async (req, res, next) => {
   req.user = currentUser;
   next();
 });
+
+// roles is an array containing allowed user types.
+// We wrap the middleware in a closure to pass parameters to it (not normally possible)
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // we have access to req.user because the previous middleware (protect) always runs before this one (see tourRoutes.js)
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action.', 403)
+      );
+    }
+    next();
+  };
+};
