@@ -2,6 +2,10 @@ const _ = require('lodash');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
 const errorHandler = require('./controllers/errorController');
@@ -14,6 +18,9 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// set secure HTTP headers
+app.use(helmet());
+
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 100,
@@ -22,7 +29,32 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-app.use(express.json());
+// body parser
+app.use(
+  express.json({
+    limit: '10kb', // req bodies larger than 10kb not accepted
+  })
+);
+
+// data sanitization (NoSQL query injection)
+app.use(mongoSanitize());
+// data sanitization (XSS)
+app.use(xss());
+
+// prevent paramenter pollution
+app.use(
+  hpp({
+    // okay to have multiple params with these values
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price',
+    ],
+  })
+);
 
 app.use(express.static(`${__dirname}/public`));
 
