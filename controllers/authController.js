@@ -33,13 +33,7 @@ exports.signup = catchAsync(async (req, res, next) => {
 
   const token = signToken(newUser._id);
 
-  res.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser,
-    },
-  });
+  createAndSendToken(newUser, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -58,11 +52,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or password', 401));
   }
 
-  const token = signToken(user._id);
-  res.status(200).json({
-    status: 'success',
-    token,
-  });
+  createAndSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -187,9 +177,41 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // update changedPasswordAt (handled in user schema)
 
   // log user in, send JWT
+  createAndSendToken(user, 200, res);
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+  // get user (use +password to add pass to document result)
+  const user = await User.findById(req.user.id).select('+password');
+  // (we don't use findbyIDAndUpdate for anything related to passwords, as it skips middleware and doesn't encrypt data)
+
+  if (!user) {
+    return next(new AppError('No user with that id.', 400));
+  }
+
+  // check if posted password correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('The provided password is incorrect.', 401));
+  }
+
+  // update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  // log user in with JWT
+  createAndSendToken(user, 201, res);
+});
+
+const createAndSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
-  res.status(200).json({
+  res.status(statusCode).json({
     status: 'success',
     token,
+    data: {
+      user,
+    },
   });
-});
+};
