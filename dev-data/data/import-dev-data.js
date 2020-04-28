@@ -16,9 +16,7 @@ mongoose
     console.log('Connection successful.');
   });
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
-);
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
 
 const importData = async () => {
   try {
@@ -46,7 +44,3 @@ if (process.argv[2] === '--import') {
 if (process.argv[2] === '--delete') {
   deleteData();
 }
-
-// app.listen(process.env.PORT, () => {
-//   console.log('App running on port', process.env.PORT);
-// });
