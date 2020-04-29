@@ -11,13 +11,15 @@ process.on('unhandledRejection', (error) => {
   });
 });
 
-process.on('uncaughtException', (error) => {
-  console.warn('Unhandled Exception - shutting down.');
-  server.close(() => {
-    // 1 == uncaught exception
-    process.exit(1);
+if (process.env.NODE_ENV !== 'development') {
+  process.on('uncaughtException', (error) => {
+    console.warn('Unhandled Exception - shutting down.');
+    server.close(() => {
+      // 1 == uncaught exception
+      process.exit(1);
+    });
   });
-});
+}
 
 const app = require('./app');
 
