@@ -116,6 +116,14 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// use virtual populate to add reviews to the tour
+// similar to join in sql
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour', // get tour property in review model by  foreign key
+  localField: '_id',
+});
+
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
