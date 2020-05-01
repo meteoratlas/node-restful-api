@@ -6,14 +6,19 @@ const factory = require('./handlerFactory');
 // not necessary, use the sign up route instead
 //const createUser = factory.createOne(User);
 
-const getAllUsers = factory.getAll(User);
-const getUser = factory.getOne(User);
+exports.getAllUsers = factory.getAll(User);
+exports.getUser = factory.getOne(User);
 
 // do not update passwords with this patch route!
-const patchUser = factory.updateOne(User);
-const deleteUser = factory.deleteOne(User);
+exports.patchUser = factory.updateOne(User);
+exports.deleteUser = factory.deleteOne(User);
 
-const updateCurrentUser = catchAsync(async (req, res, next) => {
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
+exports.updateCurrentUser = catchAsync(async (req, res, next) => {
   // if user posts password, raise error
   if (req.body.password || req.body.passwordConfirm) {
     return next(
@@ -39,12 +44,7 @@ const updateCurrentUser = catchAsync(async (req, res, next) => {
   next();
 });
 
-const getMe = (req, res, next) => {
-  req.params.id = req.user.id;
-  next();
-};
-
-const filterObj = (obj, ...allowedFields) => {
+exports.filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach((el) => {
     if (allowedFields.includes(el)) newObj[el] = obj[el];
@@ -52,20 +52,10 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-const deleteCurrentUser = catchAsync(async (req, res, next) => {
+exports.deleteCurrentUser = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
   res.status(204).json({
     status: 'success',
     data: null,
   });
 });
-
-module.exports = {
-  getAllUsers,
-  getUser,
-  getMe,
-  patchUser,
-  deleteUser,
-  updateCurrentUser,
-  deleteCurrentUser,
-};

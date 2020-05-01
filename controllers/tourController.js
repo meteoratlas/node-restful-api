@@ -3,20 +3,20 @@ const Tour = require('./../models/tourModel');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
 
-const aliasTopTours = (req, res, next) => {
+exports.getAllTours = factory.getAll(Tour);
+exports.getTour = factory.getOne(Tour, { path: 'reviews' });
+exports.createTour = factory.createOne(Tour);
+exports.patchTour = factory.updateOne(Tour);
+exports.deleteTour = factory.deleteOne(Tour);
+
+exports.aliasTopTours = (req, res, next) => {
   req.query.limit = '5';
   req.query.sort = '-ratingsAverage,price';
   req.query.fields = 'name,price,ratingsAverage, summary, difficulty';
   next();
 };
 
-const getAllTours = factory.getAll(Tour);
-const getTour = factory.getOne(Tour, { path: 'reviews' });
-const createTour = factory.createOne(Tour);
-const patchTour = factory.updateOne(Tour);
-const deleteTour = factory.deleteOne(Tour);
-
-const getTourStats = catchAsync(async (req, res, next) => {
+exports.getTourStats = catchAsync(async (req, res, next) => {
   const stats = await Tour.aggregate([
     {
       $match: { ratingsAverage: { $gte: 4.5 } },
@@ -53,7 +53,7 @@ const getTourStats = catchAsync(async (req, res, next) => {
   });
 });
 
-const getMonthlyPlan = catchAsync(async (req, res, next) => {
+exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   const year = parseInt(req.params.year);
   const plan = await Tour.aggregate([
     {
@@ -92,14 +92,3 @@ const getMonthlyPlan = catchAsync(async (req, res, next) => {
     plan,
   });
 });
-
-module.exports = {
-  getAllTours,
-  createTour,
-  getTour,
-  patchTour,
-  deleteTour,
-  getTourStats,
-  getMonthlyPlan,
-  aliasTopTours,
-};
