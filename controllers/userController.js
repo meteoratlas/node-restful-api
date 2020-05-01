@@ -1,31 +1,13 @@
 const User = require('./../models/userModel');
-const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
 
-const getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-
-  res.status(200).json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    results: users.length,
-    data: {
-      users,
-    },
-  });
-});
-
 // not necessary, use the sign up route instead
 //const createUser = factory.createOne(User);
 
-const getUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is currently unavailable.',
-  });
-};
+const getAllUsers = factory.getAll(User);
+const getUser = factory.getOne(User);
 
 // do not update passwords with this patch route!
 const patchUser = factory.updateOne(User);
