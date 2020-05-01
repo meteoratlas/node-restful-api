@@ -4,33 +4,21 @@ const userController = require('../controllers/userController');
 
 const router = express.Router();
 
-router.get(
-  '/me',
-  authController.protect,
-  userController.getMe,
-  userController.getUser
-);
-
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
-router.patch(
-  '/updatepassword',
-  authController.protect,
-  authController.updatePassword
-);
-router.patch(
-  '/updatecurrentuser',
-  authController.protect,
-  userController.updateCurrentUser
-);
-router.delete(
-  '/deletecurrentuser',
-  authController.protect,
-  userController.deleteCurrentUser
-);
-
 router.post('/forgotpassword', authController.forgotPassword);
 router.patch('/resetpassword/:token', authController.resetPassword);
+
+// All following routes after this middleware require authentication
+router.use(authController.protect);
+
+router.get('/me', userController.getMe, userController.getUser);
+
+router.patch('/updatepassword', authController.updatePassword);
+router.patch('/updatecurrentuser', userController.updateCurrentUser);
+router.delete('/deletecurrentuser', userController.deleteCurrentUser);
+
+router.use(authController.restrictTo('admin'));
 
 router.route('/').get(userController.getAllUsers); //.post(createUser);
 router
