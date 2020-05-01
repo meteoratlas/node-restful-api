@@ -39,6 +39,11 @@ const updateCurrentUser = catchAsync(async (req, res, next) => {
   next();
 });
 
+const getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
+
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach((el) => {
@@ -58,6 +63,7 @@ const deleteCurrentUser = catchAsync(async (req, res, next) => {
 module.exports = {
   getAllUsers,
   getUser,
+  getMe,
   patchUser,
   deleteUser,
   updateCurrentUser,

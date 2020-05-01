@@ -7,9 +7,12 @@ const {
   deleteUser,
   updateCurrentUser,
   deleteCurrentUser,
+  getMe,
 } = require('../controllers/userController');
 
 const router = express.Router();
+
+router.get('/me', authController.protect, getMe, getUser);
 
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
