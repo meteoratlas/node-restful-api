@@ -2,6 +2,7 @@ const User = require('./../models/userModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
+const factory = require('./handlerFactory');
 
 const getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find();
@@ -37,12 +38,7 @@ const patchUser = (req, res) => {
   });
 };
 
-const deleteUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is currently unavailable.',
-  });
-};
+const deleteUser = factory.deleteOne(User);
 
 const updateCurrentUser = catchAsync(async (req, res, next) => {
   // if user posts password, raise error
