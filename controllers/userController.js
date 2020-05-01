@@ -17,12 +17,8 @@ const getAllUsers = catchAsync(async (req, res, next) => {
   });
 });
 
-const createUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is currently unavailable.',
-  });
-};
+// not necessary, use the sign up route instead
+//const createUser = factory.createOne(User);
 
 const getUser = (req, res) => {
   res.status(500).json({
@@ -31,13 +27,8 @@ const getUser = (req, res) => {
   });
 };
 
-const patchUser = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is currently unavailable.',
-  });
-};
-
+// do not update passwords with this patch route!
+const patchUser = factory.updateOne(User);
 const deleteUser = factory.deleteOne(User);
 
 const updateCurrentUser = catchAsync(async (req, res, next) => {
@@ -84,7 +75,6 @@ const deleteCurrentUser = catchAsync(async (req, res, next) => {
 
 module.exports = {
   getAllUsers,
-  createUser,
   getUser,
   patchUser,
   deleteUser,

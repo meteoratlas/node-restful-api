@@ -2,7 +2,6 @@ const express = require('express');
 const authController = require('./../controllers/authController');
 const {
   getAllUsers,
-  createUser,
   getUser,
   patchUser,
   deleteUser,
@@ -25,7 +24,7 @@ router.delete('/deletecurrentuser', authController.protect, deleteCurrentUser);
 router.post('/forgotpassword', authController.forgotPassword);
 router.patch('/resetpassword/:token', authController.resetPassword);
 
-router.route('/').get(getAllUsers).post(createUser);
+router.route('/').get(getAllUsers); //.post(createUser);
 router.route('/:id').get(getUser).patch(patchUser).delete(deleteUser);
 
 module.exports = router;
