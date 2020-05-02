@@ -19,6 +19,12 @@ router
   );
 router.route('/tour-stats').get(tourController.getTourStats);
 
+router
+  .route('/tours-within/:distance/center/:latlong/:unit')
+  .get(tourController.getToursWithin);
+
+router.route('/distances/:latlong/unit/:unit').get(tourController.getDistances);
+
 // middleware cam optionally be first value of route function
 router
   .route('/')

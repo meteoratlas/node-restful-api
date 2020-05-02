@@ -34,6 +34,7 @@ const tourSchema = new mongoose.Schema(
       default: 4.5,
       min: [1, 'Rating must be 1 or above.'],
       max: [5, 'Rating must be 5 or below.'],
+      set: (val) => Math.round(val * 10) / 10,
     },
     ratingQuantity: { type: Number, default: 0 },
     price: {
@@ -119,6 +120,9 @@ const tourSchema = new mongoose.Schema(
 // can add multiple attributes to the object for compound queries
 tourSchema.index({ price: 1 });
 tourSchema.index({ slug: 1 });
+tourSchema.index({
+  startLocation: '2dsphere',
+});
 
 // use virtual populate to add reviews to the tour
 // similar to join in sql
@@ -181,13 +185,13 @@ tourSchema.post(/^find/, function (docs, next) {
 
 // aggregation middleware
 
-tourSchema.pre('aggregate', function (next) {
-  this.pipeline().unshift({
-    $match: { secretTour: { $ne: true } },
-  });
+// tourSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({
+//     $match: { secretTour: { $ne: true } },
+//   });
 
-  next();
-});
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
