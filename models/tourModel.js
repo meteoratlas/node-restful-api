@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const validator = require('validator');
-// const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -115,6 +113,12 @@ const tourSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+// index attributes in a cache to speed up queries
+// They take up resources and need to be recalculated every time the document is updated, so they're best for static documents that are searched often
+// can add multiple attributes to the object for compound queries
+tourSchema.index({ price: 1 });
+tourSchema.index({ slug: 1 });
 
 // use virtual populate to add reviews to the tour
 // similar to join in sql
