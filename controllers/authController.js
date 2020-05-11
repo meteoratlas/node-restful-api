@@ -114,6 +114,32 @@ exports.restrictTo = (...roles) => {
   };
 };
 
+// only for rendered pages, no errors
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  // get token if it exists
+  if (req.cookies.jwt) {
+    // validate token
+    const decoded = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+
+    // check if user still exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) return next();
+
+    // check if user changed their password after JWT was issued
+    // iat == "issued at"
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+    // give access to templates
+    res.locals.user = currentUser;
+  }
+
+  next();
+});
+
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // get user based on posted email
   const user = await User.findOne({ email: req.body.email });
