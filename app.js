@@ -7,6 +7,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const path = require('path');
+const cookieParser = require('cookie-parser');
 
 const AppError = require('./utils/appError');
 const errorHandler = require('./controllers/errorController');
@@ -43,6 +44,8 @@ app.use(
     limit: '10kb', // req bodies larger than 10kb not accepted
   })
 );
+
+app.use(cookieParser());
 
 // data sanitization (NoSQL query injection)
 app.use(mongoSanitize());
