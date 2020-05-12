@@ -18,6 +18,14 @@ exports.getMe = (req, res, next) => {
   next();
 };
 
+exports.filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el)) newObj[el] = obj[el];
+  });
+  return newObj;
+};
+
 exports.updateCurrentUser = catchAsync(async (req, res, next) => {
   // if user posts password, raise error
   if (req.body.password || req.body.passwordConfirm) {
@@ -27,7 +35,8 @@ exports.updateCurrentUser = catchAsync(async (req, res, next) => {
   }
   // filter out attributes we don't want updated
   // ie, only allow name and email for now
-  const filteredBody = filterObj(req.body, 'name', 'email');
+  // const filteredBody = filterObj(req.body, 'name', 'email');
+  const filteredBody = this.filterObj(req.body, 'name', 'email');
 
   // update user document
   const user = await User.findByIdAndUpdate(req.user.id, filteredBody, {
@@ -43,14 +52,6 @@ exports.updateCurrentUser = catchAsync(async (req, res, next) => {
   });
   next();
 });
-
-exports.filterObj = (obj, ...allowedFields) => {
-  const newObj = {};
-  Object.keys(obj).forEach((el) => {
-    if (allowedFields.includes(el)) newObj[el] = obj[el];
-  });
-  return newObj;
-};
 
 exports.deleteCurrentUser = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
