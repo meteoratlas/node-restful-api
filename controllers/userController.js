@@ -2,11 +2,33 @@ const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const factory = require('./handlerFactory');
+const multer = require('multer');
 
-// not necessary, use the sign up route instead
-//const createUser = factory.createOne(User);
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/img/users');
+  },
+  filename: (req, file, cb) => {
+    const ext = file.mimetype.split('/')[1];
+    cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+  },
+});
 
-exports.getAllUsers = factory.getAll(User);
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an image; please upload an image.', 400), false);
+  }
+};
+
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+
+(exports.uploadUserPhoto = upload.single('photo')),
+  // not necessary, use the sign up route instead
+  //const createUser = factory.createOne(User);
+
+  (exports.getAllUsers = factory.getAll(User));
 exports.getUser = factory.getOne(User);
 
 // do not update passwords with this patch route!
@@ -37,6 +59,12 @@ exports.updateCurrentUser = catchAsync(async (req, res, next) => {
   // ie, only allow name and email for now
   // const filteredBody = filterObj(req.body, 'name', 'email');
   const filteredBody = this.filterObj(req.body, 'name', 'email');
+  console.log(req);
+
+  if (req.file) {
+    filteredBody.photo = req.file.filename;
+    console.log(req.file.filename);
+  }
 
   // update user document
   const user = await User.findByIdAndUpdate(req.user.id, filteredBody, {
