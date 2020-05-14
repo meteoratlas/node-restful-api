@@ -59,7 +59,6 @@ exports.updateCurrentUser = catchAsync(async (req, res, next) => {
   // ie, only allow name and email for now
   // const filteredBody = filterObj(req.body, 'name', 'email');
   const filteredBody = filterObj(req.body, 'name', 'email');
-  console.log(req);
 
   if (req.file) {
     filteredBody.photo = req.file.filename;
@@ -78,7 +77,6 @@ exports.updateCurrentUser = catchAsync(async (req, res, next) => {
       user,
     },
   });
-  next();
 });
 
 exports.deleteCurrentUser = catchAsync(async (req, res, next) => {
