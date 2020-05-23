@@ -18,7 +18,6 @@ export const login = async (email, password) => {
         location.assign('/');
       }, 1500);
     }
-    console.log(res);
   } catch (error) {
     showAlert('error', error.response.data.message);
   }
@@ -32,7 +31,6 @@ export const logout = async () => {
     });
     if ((res.data.status = 'success')) location.reload(true);
   } catch (err) {
-    console.log(err.response);
     showAlert('error', 'Error logging out! Try again.');
   }
 };

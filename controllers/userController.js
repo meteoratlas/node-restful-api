@@ -79,7 +79,7 @@ exports.updateCurrentUser = catchAsync(async (req, res, next) => {
 
   if (req.file) {
     filteredBody.photo = req.file.filename;
-    console.log(req.file.filename);
+    // console.log(req.file.filename);
   }
 
   // update user document

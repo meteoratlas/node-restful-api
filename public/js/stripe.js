@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { showAlert } from './alerts';
+import { showAlert } from './alert';
 const stripe = Stripe(/* public key goes here */);
 
 export const bookTour = async (tourId) => {
