@@ -38,3 +38,11 @@ mongoose
 const server = app.listen(process.env.PORT, () => {
   console.log('App running on port', process.env.PORT);
 });
+
+// handle heroku shut down message
+process.on('SIGTERM', () => {
+  // close the server gracefully, so we don't have suspended requests/responses
+  server.close(() => {
+    console.log('Process terminated.');
+  });
+});

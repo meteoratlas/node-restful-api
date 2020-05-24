@@ -9,6 +9,7 @@ const hpp = require('hpp');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const errorHandler = require('./controllers/errorController');
@@ -22,6 +23,10 @@ const app = express();
 app.enable('trust proxy');
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
+
+// Access-Control-Allow-Origin
+app.use(cors());
+app.options('*', cors()); // preflight phase
 
 app.use(express.static(path.join(__dirname, 'public')));
 
